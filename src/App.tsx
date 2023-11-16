@@ -1,9 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './App.css'
 import { UsersList } from './components/UsersList'
 
 function App() {
   const [users, setUsers] = React.useState([])
+  const [showColors, setShowColors] = useState(false)
+
+  const toogleColors = () => {
+    setShowColors(!showColors)
+  }
 
   React.useEffect(() => {
     const fetchtingData = async () => {
@@ -24,7 +29,12 @@ function App() {
   return (
     <div className="App">
       <h1>Prueba técnica</h1>
-      <UsersList users={users} />
+      <header>
+        <button onClick={toogleColors}>Colorear filas</button>
+      </header>
+      <main>
+        <UsersList users={users} showColors={showColors} />
+      </main>
     </div>
   )
 }
