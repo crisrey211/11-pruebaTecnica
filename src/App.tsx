@@ -1,13 +1,19 @@
 import React, { useState } from 'react'
 import './App.css'
 import { UsersList } from './components/UsersList'
+import { type User } from './components/types'
 
 function App() {
-  const [users, setUsers] = React.useState([])
+  const [users, setUsers] = React.useState<User[]>([])
   const [showColors, setShowColors] = useState(false)
+  const [sortByCountry, setSortByCountry] = useState(false)
 
   const toogleColors = () => {
     setShowColors(!showColors)
+  }
+
+  const toogleSortByCountry = () => {
+    setSortByCountry((prevState) => !prevState)
   }
 
   React.useEffect(() => {
@@ -26,14 +32,23 @@ function App() {
     fetchtingData()
   }, [])
 
+  const sortedUsers = sortByCountry
+    ? [...users].sort((a, b) => {
+        return a.location.country.localeCompare(b.location.country)
+      })
+    : users
+
   return (
     <div className="App">
       <h1>Prueba técnica</h1>
       <header>
         <button onClick={toogleColors}>Colorear filas</button>
+        <button onClick={toogleSortByCountry}>
+          {sortByCountry ? 'No ordenar por país' : 'Ordenar por país'}
+        </button>
       </header>
       <main>
-        <UsersList users={users} showColors={showColors} />
+        <UsersList users={sortedUsers} showColors={showColors} />
       </main>
     </div>
   )
