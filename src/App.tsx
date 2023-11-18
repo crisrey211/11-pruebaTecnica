@@ -8,6 +8,7 @@ function App() {
   const [showColors, setShowColors] = useState(false)
   const [sortByCountry, setSortByCountry] = useState(false)
   const originalUsers = React.useRef<User[]>([])
+  const [filterCountry, setFilterCountry] = useState<string | null>(null)
 
   const toogleColors = () => {
     setShowColors(!showColors)
@@ -41,11 +42,20 @@ function App() {
     fetchtingData()
   }, [])
 
+  const filteredUsers =
+    filterCountry !== null && filterCountry.length > 0
+      ? users.filter((user) => {
+          return user.location.country
+            .toLocaleLowerCase()
+            .includes(filterCountry.toLocaleLowerCase())
+        })
+      : users
+
   const sortedUsers = sortByCountry
-    ? [...users].sort((a, b) => {
+    ? [...filteredUsers].sort((a, b) => {
         return a.location.country.localeCompare(b.location.country)
       })
-    : users
+    : filteredUsers
   const handleReset = () => {
     setUsers(originalUsers.current)
   }
@@ -59,6 +69,10 @@ function App() {
         </button>
         <button onClick={handleReset}>Resetear estado</button>
       </header>
+      <input
+        placeholder="Filtrar por país"
+        onChange={(ev) => setFilterCountry(ev.target.value)}
+      />
       <main>
         <UsersList
           users={sortedUsers}
