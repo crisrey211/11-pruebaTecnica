@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import './App.css'
-import { UsersList } from './components/UsersList'
 import { type User } from './components/types'
+import { UsersList } from './components/UsersList'
 
 function App() {
   const [users, setUsers] = React.useState<User[]>([])
@@ -42,20 +42,26 @@ function App() {
     fetchtingData()
   }, [])
 
-  const filteredUsers =
-    filterCountry !== null && filterCountry.length > 0
+  const filteredUsers = React.useMemo(() => {
+    console.log('calculate filteresd Users')
+    return filterCountry !== null && filterCountry.length > 0
       ? users.filter((user) => {
           return user.location.country
             .toLocaleLowerCase()
             .includes(filterCountry.toLocaleLowerCase())
         })
       : users
+  }, [users, filterCountry])
 
-  const sortedUsers = sortByCountry
-    ? [...filteredUsers].sort((a, b) => {
-        return a.location.country.localeCompare(b.location.country)
-      })
-    : filteredUsers
+  const sortedUsers = React.useMemo(() => {
+    console.log('calculate sorted Users')
+    return sortByCountry
+      ? [...filteredUsers].sort((a, b) => {
+          return a.location.country.localeCompare(b.location.country)
+        })
+      : filteredUsers
+  }, [filteredUsers, sortByCountry])
+
   const handleReset = () => {
     setUsers(originalUsers.current)
   }
