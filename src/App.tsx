@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import './App.css'
 import { UsersList } from './components/UsersList'
 import { type User } from './components/types'
@@ -7,6 +7,7 @@ function App() {
   const [users, setUsers] = React.useState<User[]>([])
   const [showColors, setShowColors] = useState(false)
   const [sortByCountry, setSortByCountry] = useState(false)
+  const originalUsers = React.useRef<User[]>([])
 
   const toogleColors = () => {
     setShowColors(!showColors)
@@ -32,6 +33,7 @@ function App() {
         }
         const data = await response.json()
         setUsers(data.results)
+        originalUsers.current = data.results
       } catch (error) {
         console.error('Ha habido un fallo')
       }
@@ -44,6 +46,9 @@ function App() {
         return a.location.country.localeCompare(b.location.country)
       })
     : users
+  const handleReset = () => {
+    setUsers(originalUsers.current)
+  }
   return (
     <div className="App">
       <h1>Prueba técnica</h1>
@@ -52,6 +57,7 @@ function App() {
         <button onClick={toogleSortByCountry}>
           {sortByCountry ? 'No ordenar por país' : 'Ordenar por país'}
         </button>
+        <button onClick={handleReset}>Resetear estado</button>
       </header>
       <main>
         <UsersList
