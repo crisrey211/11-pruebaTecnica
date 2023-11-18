@@ -16,6 +16,13 @@ function App() {
     setSortByCountry((prevState) => !prevState)
   }
 
+  const handleDelete = (email: string) => {
+    const filteredUsers = users.filter((user) => {
+      return user.email !== email
+    })
+    setUsers(filteredUsers)
+  }
+
   React.useEffect(() => {
     const fetchtingData = async () => {
       try {
@@ -37,7 +44,6 @@ function App() {
         return a.location.country.localeCompare(b.location.country)
       })
     : users
-
   return (
     <div className="App">
       <h1>Prueba técnica</h1>
@@ -48,7 +54,11 @@ function App() {
         </button>
       </header>
       <main>
-        <UsersList users={sortedUsers} showColors={showColors} />
+        <UsersList
+          users={sortedUsers}
+          showColors={showColors}
+          deleteUser={handleDelete}
+        />
       </main>
     </div>
   )
