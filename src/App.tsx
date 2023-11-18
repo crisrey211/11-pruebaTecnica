@@ -10,6 +10,10 @@ function App() {
   const originalUsers = React.useRef<User[]>([])
   const [filterCountry, setFilterCountry] = useState<string | null>(null)
 
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+
   const toogleColors = () => {
     setShowColors(!showColors)
   }
@@ -27,20 +31,30 @@ function App() {
 
   React.useEffect(() => {
     const fetchtingData = async () => {
+      setLoading(true)
+      setError(false)
       try {
-        const response = await fetch('https://randomuser.me/api?results=100')
+        const response = await fetch(
+          `https://randomuser.me/api?results=10&seed=midudev&page=${currentPage}`
+          /* `https://randomuser.me/api?results=10` */
+        )
         if (!response.ok) {
           throw Error('Erroe en el fetching')
         }
         const data = await response.json()
-        setUsers(data.results)
-        originalUsers.current = data.results
+        setUsers((prevUsers) => {
+          const newUsers = prevUsers.concat(data.results)
+          originalUsers.current = newUsers
+          return newUsers
+        })
       } catch (error) {
-        console.error('Ha habido un fallo')
+        setError(true)
+      } finally {
+        setLoading(false)
       }
     }
     fetchtingData()
-  }, [])
+  }, [currentPage])
 
   const filteredUsers = React.useMemo(() => {
     console.log('calculate filteresd Users')
@@ -80,11 +94,25 @@ function App() {
         onChange={(ev) => setFilterCountry(ev.target.value)}
       />
       <main>
-        <UsersList
-          users={sortedUsers}
-          showColors={showColors}
-          deleteUser={handleDelete}
-        />
+        {users.length > 0 && (
+          <UsersList
+            users={sortedUsers}
+            showColors={showColors}
+            deleteUser={handleDelete}
+          />
+        )}
+
+        {loading && <p>Cargando ...</p>}
+
+        {!loading && error && <p>Ha habido un error</p>}
+
+        {!loading && !error && users.length === 0 && <p>No hay usuarios</p>}
+
+        {!loading && !error && (
+          <button onClick={() => setCurrentPage(currentPage + 1)}>
+            Cargar más resultados
+          </button>
+        )}
       </main>
     </div>
   )
